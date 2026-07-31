@@ -1,0 +1,16 @@
+{
+  "name": "LiverLogger",
+  "short_name": "LiverLog",
+  "description": "Private, offline drink tracker with one-tap logging and research-backed guidelines.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#14141a",
+  "theme_color": "#171923",
+  "orientation": "portrait",
+  "lang": "en",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

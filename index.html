@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en" id="html-root">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>LiverLogger</title>
+
+<!-- iOS "Add to Home Screen" support -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="LiverLogger">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#171923">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ================= TOP BAR ================= -->
+<header class="topbar">
+  <div class="topbar-brand">
+    <span class="brand-mark">🥃</span>
+    <span class="brand-name">LiverLogger</span>
+  </div>
+  <div class="topbar-date" id="topbar-date"></div>
+</header>
+
+<!-- ================= LOG TAB ================= -->
+<main id="tab-log" class="tab-panel">
+
+  <section class="today-card">
+    <div class="today-card-row">
+      <div>
+        <div class="today-total" id="today-total-grams">0 g</div>
+        <div class="today-sub" id="today-total-units" data-i18n="today.units"></div>
+      </div>
+      <div class="today-streak" id="today-streak"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title" data-i18n="log.quickAdd"></h2>
+    <div class="preset-grid" id="preset-grid"><!-- injected --></div>
+    <button class="btn-custom" id="btn-open-custom" data-i18n="log.custom"></button>
+  </section>
+
+  <section>
+    <div class="section-title-row">
+      <h2 class="section-title" data-i18n="log.today"></h2>
+      <span class="muted" id="today-count"></span>
+    </div>
+    <ul class="entry-list" id="entry-list"><!-- injected --></ul>
+    <p class="empty-hint" id="today-empty-hint" data-i18n="log.emptyToday"></p>
+  </section>
+
+</main>
+
+<!-- ================= STATS TAB ================= -->
+<main id="tab-stats" class="tab-panel hidden">
+
+  <section class="stat-cards">
+    <div class="stat-card">
+      <div class="stat-value" id="stat-free-streak">0</div>
+      <div class="stat-label" data-i18n="stats.freeStreak"></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="stat-free-30"></div>
+      <div class="stat-label" data-i18n="stats.freeDays30"></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="stat-week-total"></div>
+      <div class="stat-label" data-i18n="stats.weekTotal"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title" data-i18n="stats.last7"></h2>
+    <div class="chart-box"><canvas id="chart-7day"></canvas></div>
+  </section>
+
+  <section>
+    <h2 class="section-title" data-i18n="stats.weeks"></h2>
+    <div class="chart-box"><canvas id="chart-weeks"></canvas></div>
+    <p class="chart-note" data-i18n="stats.weeksNote"></p>
+  </section>
+
+  <section>
+    <div class="section-title-row">
+      <h2 class="section-title" data-i18n="stats.byType"></h2>
+      <select id="donut-range" class="mini-select">
+        <option value="7" data-i18n="stats.range7"></option>
+        <option value="30" selected data-i18n="stats.range30"></option>
+        <option value="90" data-i18n="stats.range90"></option>
+      </select>
+    </div>
+    <div class="chart-box chart-box-small"><canvas id="chart-donut"></canvas></div>
+  </section>
+
+  <section>
+    <h2 class="section-title" data-i18n="stats.calendar"></h2>
+    <div class="heatmap" id="heatmap"><!-- injected --></div>
+    <div class="heatmap-legend">
+      <span class="legend-swatch legend-0"></span><span class="muted" data-i18n="stats.legendFree"></span>
+      <span class="legend-swatch legend-1"></span>
+      <span class="legend-swatch legend-2"></span>
+      <span class="legend-swatch legend-3"></span><span class="muted" data-i18n="stats.legendHigh"></span>
+    </div>
+  </section>
+
+</main>
+
+<!-- ================= INFO TAB ================= -->
+<main id="tab-info" class="tab-panel hidden">
+  <p class="disclaimer" data-i18n="info.disclaimer"></p>
+  <div id="info-content"><!-- injected --></div>
+</main>
+
+<!-- ================= SETTINGS TAB ================= -->
+<main id="tab-settings" class="tab-panel hidden">
+
+  <section>
+    <h2 class="section-title" data-i18n="settings.language"></h2>
+    <div class="segmented" id="lang-toggle">
+      <button data-lang="en">English</button>
+      <button data-lang="de">Deutsch</button>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title" data-i18n="settings.unit"></h2>
+    <div class="segmented" id="unit-toggle">
+      <button data-unit="us" data-i18n="settings.unitUs"></button>
+      <button data-unit="uk" data-i18n="settings.unitUk"></button>
+      <button data-unit="de" data-i18n="settings.unitDe"></button>
+    </div>
+    <p class="chart-note" data-i18n="settings.unitNote"></p>
+  </section>
+
+  <section>
+    <div class="section-title-row">
+      <h2 class="section-title" data-i18n="settings.presets"></h2>
+      <button class="link-btn" id="btn-add-preset" data-i18n="settings.addPreset"></button>
+    </div>
+    <ul class="preset-manage-list" id="preset-manage-list"><!-- injected --></ul>
+  </section>
+
+  <section>
+    <h2 class="section-title" data-i18n="settings.data"></h2>
+    <div class="btn-row">
+      <button class="btn-secondary" id="btn-export" data-i18n="settings.export"></button>
+      <button class="btn-secondary" id="btn-import" data-i18n="settings.import"></button>
+      <input type="file" id="import-file" accept="application/json" hidden>
+    </div>
+    <button class="btn-danger" id="btn-clear" data-i18n="settings.clear"></button>
+    <p class="chart-note" data-i18n="settings.dataNote"></p>
+  </section>
+
+  <section>
+    <h2 class="section-title" data-i18n="settings.about"></h2>
+    <p class="chart-note" data-i18n="settings.aboutText"></p>
+    <p class="chart-note" id="version-line"></p>
+  </section>
+
+</main>
+
+<!-- ================= CUSTOM ENTRY MODAL ================= -->
+<div class="modal-backdrop hidden" id="custom-modal">
+  <div class="modal">
+    <h3 data-i18n="modal.title"></h3>
+
+    <label class="modal-label" data-i18n="modal.type"></label>
+    <div class="segmented" id="modal-type">
+      <button data-type="beer">🍺</button>
+      <button data-type="wine">🍷</button>
+      <button data-type="spirits">🥃</button>
+      <button data-type="cocktail">🍸</button>
+      <button data-type="other">🍹</button>
+    </div>
+
+    <label class="modal-label" data-i18n="modal.volume"></label>
+    <input type="number" id="modal-volume" inputmode="numeric" min="0" step="10" placeholder="330">
+
+    <label class="modal-label" data-i18n="modal.abv"></label>
+    <input type="number" id="modal-abv" inputmode="decimal" min="0" step="0.5" placeholder="5">
+    <div class="chip-row">
+      <button class="chip" data-abv="5">5%</button>
+      <button class="chip" data-abv="12">12%</button>
+      <button class="chip" data-abv="40">40%</button>
+    </div>
+
+    <div class="modal-preview" id="modal-preview"></div>
+
+    <label class="modal-checkbox">
+      <input type="checkbox" id="modal-save-preset">
+      <span data-i18n="modal.savePreset"></span>
+    </label>
+
+    <div class="btn-row">
+      <button class="btn-secondary" id="modal-cancel" data-i18n="modal.cancel"></button>
+      <button class="btn-primary" id="modal-add" data-i18n="modal.add"></button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= TOAST ================= -->
+<div class="toast hidden" id="toast">
+  <span id="toast-text"></span>
+  <button id="toast-undo" data-i18n="toast.undo"></button>
+</div>
+
+<!-- ================= BOTTOM NAV ================= -->
+<nav class="tabbar">
+  <button class="tabbar-btn active" data-tab="log">
+    <span class="tabbar-icon">🍺</span><span data-i18n="nav.log"></span>
+  </button>
+  <button class="tabbar-btn" data-tab="stats">
+    <span class="tabbar-icon">📊</span><span data-i18n="nav.stats"></span>
+  </button>
+  <button class="tabbar-btn" data-tab="info">
+    <span class="tabbar-icon">📖</span><span data-i18n="nav.info"></span>
+  </button>
+  <button class="tabbar-btn" data-tab="settings">
+    <span class="tabbar-icon">⚙️</span><span data-i18n="nav.settings"></span>
+  </button>
+</nav>
+
+<script src="chart.umd.min.js"></script>
+<script src="logic.js"></script>
+<script src="i18n.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
