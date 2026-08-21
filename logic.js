@@ -3,6 +3,12 @@
  * No DOM access in this file, so it can run both in the browser (loaded via
  * <script>, attaches to window.Logic) and in Node (module.exports) for unit
  * testing without needing a browser or canvas.
+ *
+ * v2: generalized the aggregation helpers to work on any numeric field via a
+ * `key` argument, so the same date/week/month/year math serves both alcohol
+ * entries (key: "grams") and weed entries (key: "mgThc") without duplicating
+ * logic. The original grams-only function names are kept as thin wrappers so
+ * existing call sites (and v1 tests) keep working unchanged.
  */
 (function (root, factory) {
   if (typeof module === "object" && module.exports) {
@@ -26,6 +32,12 @@
     jp: 19.75, // Japan "go" — kept for completeness, not shown by default
   };
 
+  // A "Standard THC Unit" = 5mg THC — proposed in the research literature and
+  // now mandated by NIH for THC reporting in the studies it funds. Used the
+  // same way UNIT_GRAMS.us is used for alcohol: a display convenience, not a
+  // claim about what's "safe."
+  var MG_THC_PER_UNIT = 5;
+
   // Weekly reference thresholds used only to give the user a sense of scale
   // on the charts — never presented as a "safe" amount. See info tab / README
   // for sourcing: WHO (2023) states no level of alcohol use is established as
@@ -38,8 +50,19 @@
     usOldModerateWomen: 7 * UNIT_GRAMS.us, // = 98g/week (pre-2025 US guideline, 1/day)
   };
 
+  // Sensible starting points for the user-editable warning thresholds in
+  // Settings — not medical advice, just a prefilled, well-sourced default.
+  var DEFAULT_WARN_THRESHOLDS = {
+    alcoholDailyG: 40, // roughly a "heavy single occasion" ballpark (~4 US standard drinks)
+    alcoholWeeklyG: WEEKLY_REFERENCES_G.ukCmo14Units, // 112g, UK CMO guideline
+    weedFrequentDays: 5, // flag if used on 5+ of the last 7 days (LRCUG: avoid near-daily use)
+  };
+
   function round1(n) {
     return Math.round(n * 10) / 10;
+  }
+  function round3(n) {
+    return Math.round(n * 1000) / 1000;
   }
 
   function gramsFromVolumeAbv(volumeMl, abvPercent) {
@@ -48,9 +71,28 @@
     return v * (a / 100) * ETHANOL_DENSITY;
   }
 
+  // Grams of pure alcohol -> liters of pure alcohol (i.e. the volume the
+  // ethanol itself would occupy, not the volume of the drink). Displayed as
+  // the primary unit per user preference, with grams as the secondary/
+  // scientific unit alongside it.
+  function litersFromGrams(grams) {
+    return grams / ETHANOL_DENSITY / 1000;
+  }
+
   function unitsFromGrams(grams, unitKey) {
     var unit = UNIT_GRAMS[unitKey] || UNIT_GRAMS.us;
     return grams / unit;
+  }
+
+  // Weed: mg THC from a smoked amount (flower grams x THC%), or pass mgThc
+  // directly for vapes/edibles where potency is already labeled in mg.
+  function mgThcFromFlower(flowerGrams, thcPercent) {
+    var g = Number(flowerGrams) || 0;
+    var pct = Number(thcPercent) || 0;
+    return g * (pct / 100) * 1000;
+  }
+  function thcUnitsFromMg(mgThc) {
+    return mgThc / MG_THC_PER_UNIT;
   }
 
   // ---- date helpers (all operate on local calendar dates, "YYYY-MM-DD") ----
@@ -77,6 +119,16 @@
     return date.getFullYear() + "-W" + String(week).padStart(2, "0");
   }
 
+  function monthKey(d) {
+    var date = d instanceof Date ? d : new Date(d);
+    return date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, "0");
+  }
+
+  function yearKey(d) {
+    var date = d instanceof Date ? d : new Date(d);
+    return String(date.getFullYear());
+  }
+
   function startOfWeek(d) {
     var date = d instanceof Date ? new Date(d.getTime()) : new Date(d);
     date.setHours(0, 0, 0, 0);
@@ -85,91 +137,127 @@
     return date;
   }
 
-  // ---- aggregation ----
+  function startOfMonth(d) {
+    var date = d instanceof Date ? new Date(d.getTime()) : new Date(d);
+    return new Date(date.getFullYear(), date.getMonth(), 1);
+  }
 
-  // entries: [{ id, ts (ISO string), type, volumeMl, abv, grams }]
+  // ---- generic aggregation: works on any numeric entry field via `key` ----
+  // entries: [{ id, ts (ISO string), type, ...substance-specific fields }]
 
-  function totalGrams(entries) {
+  function totalAmount(entries, key) {
     return entries.reduce(function (sum, e) {
-      return sum + e.grams;
+      return sum + (e[key] || 0);
     }, 0);
   }
 
-  function groupByDay(entries) {
+  function groupByDayAmount(entries, key) {
     var map = {};
     entries.forEach(function (e) {
-      var key = toDateKey(e.ts);
-      map[key] = (map[key] || 0) + e.grams;
+      var k = toDateKey(e.ts);
+      map[k] = (map[k] || 0) + (e[key] || 0);
     });
     return map;
   }
 
-  function groupByWeek(entries) {
+  function groupByWeekAmount(entries, key) {
     var map = {};
     entries.forEach(function (e) {
-      var key = isoWeekKey(e.ts);
-      map[key] = (map[key] || 0) + e.grams;
+      var k = isoWeekKey(e.ts);
+      map[k] = (map[k] || 0) + (e[key] || 0);
     });
     return map;
   }
 
-  function groupByType(entries) {
+  function groupByMonthAmount(entries, key) {
     var map = {};
     entries.forEach(function (e) {
-      map[e.type] = (map[e.type] || 0) + e.grams;
+      var k = monthKey(e.ts);
+      map[k] = (map[k] || 0) + (e[key] || 0);
     });
     return map;
   }
 
-  // last N days (including today), returns array of { date, grams } oldest->newest
-  function lastNDays(entries, n, today) {
-    var byDay = groupByDay(entries);
+  function groupByYearAmount(entries, key) {
+    var map = {};
+    entries.forEach(function (e) {
+      var k = yearKey(e.ts);
+      map[k] = (map[k] || 0) + (e[key] || 0);
+    });
+    return map;
+  }
+
+  function groupByTypeAmount(entries, key) {
+    var map = {};
+    entries.forEach(function (e) {
+      map[e.type] = (map[e.type] || 0) + (e[key] || 0);
+    });
+    return map;
+  }
+
+  // last N days (including today), returns array of { date, amount } oldest->newest
+  function lastNDaysAmount(entries, n, key, today) {
+    var byDay = groupByDayAmount(entries, key);
     var ref = today ? new Date(today) : new Date();
     ref.setHours(0, 0, 0, 0);
     var out = [];
     for (var i = n - 1; i >= 0; i--) {
       var d = new Date(ref.getTime());
       d.setDate(d.getDate() - i);
-      var key = toDateKey(d);
-      out.push({ date: key, grams: round1(byDay[key] || 0) });
+      var k = toDateKey(d);
+      out.push({ date: k, amount: round3(byDay[k] || 0) });
     }
     return out;
   }
 
-  // last N iso weeks, oldest->newest, returns { weekKey, weekStart, grams }
-  function lastNWeeks(entries, n, today) {
-    var byWeek = groupByWeek(entries);
+  // last N iso weeks, oldest->newest, returns { weekKey, weekStart, amount }
+  function lastNWeeksAmount(entries, n, key, today) {
+    var byWeek = groupByWeekAmount(entries, key);
     var ref = today ? new Date(today) : new Date();
     var thisWeekStart = startOfWeek(ref);
     var out = [];
     for (var i = n - 1; i >= 0; i--) {
       var d = new Date(thisWeekStart.getTime());
       d.setDate(d.getDate() - i * 7);
-      var key = isoWeekKey(d);
-      out.push({
-        weekKey: key,
-        weekStart: toDateKey(d),
-        grams: round1(byWeek[key] || 0),
-      });
+      var k = isoWeekKey(d);
+      out.push({ weekKey: k, weekStart: toDateKey(d), amount: round3(byWeek[k] || 0) });
     }
     return out;
   }
 
-  // Current alcohol-free streak, counting back from today (or yesterday if
-  // today already has an entry and you want "prior streak" — kept simple:
-  // counts consecutive 0-gram days ending today).
-  function currentFreeStreak(entries, today) {
-    // No history yet — nothing to report a streak against (avoids a brand
-    // new install claiming a multi-year streak just because it has no data).
+  // last N calendar months, oldest->newest, returns { monthKey, amount }
+  function lastNMonthsAmount(entries, n, key, today) {
+    var byMonth = groupByMonthAmount(entries, key);
+    var ref = today ? new Date(today) : new Date();
+    var thisMonthStart = startOfMonth(ref);
+    var out = [];
+    for (var i = n - 1; i >= 0; i--) {
+      var d = new Date(thisMonthStart.getFullYear(), thisMonthStart.getMonth() - i, 1);
+      var k = monthKey(d);
+      out.push({ monthKey: k, monthStart: toDateKey(d), amount: round3(byMonth[k] || 0) });
+    }
+    return out;
+  }
+
+  function yearTotalAmount(entries, key, year, today) {
+    var y = year || yearKey(today || new Date());
+    return round3(
+      entries
+        .filter(function (e) { return yearKey(e.ts) === y; })
+        .reduce(function (sum, e) { return sum + (e[key] || 0); }, 0)
+    );
+  }
+
+  function currentFreeStreakAmount(entries, key, today) {
     if (!entries.length) return 0;
-    var byDay = groupByDay(entries);
+    var byDay = groupByDayAmount(entries, key);
     var ref = today ? new Date(today) : new Date();
     ref.setHours(0, 0, 0, 0);
     var streak = 0;
     var d = new Date(ref.getTime());
     while (true) {
-      var key = toDateKey(d);
-      if ((byDay[key] || 0) > 0) break;
+      var k = toDateKey(d);
+      if ((byDay[k] || 0) > 0) break;
       streak++;
       d.setDate(d.getDate() - 1);
       if (streak > 3650) break; // safety valve
@@ -177,24 +265,76 @@
     return streak;
   }
 
-  // Free days in the last N days (for the calendar heatmap / weekly summary)
-  function freeDaysCount(entries, n, today) {
+  function freeDaysCountAmount(entries, n, key, today) {
     if (!entries.length) return 0;
-    var days = lastNDays(entries, n, today);
-    return days.filter(function (d) {
-      return d.grams === 0;
-    }).length;
+    var days = lastNDaysAmount(entries, n, key, today);
+    return days.filter(function (d) { return d.amount === 0; }).length;
   }
+
+  // Days with any use in the last N days — the mirror of freeDaysCount,
+  // used for the weed frequency warning (LRCUG cares about frequency more
+  // than single-session dose).
+  function usedDaysCountAmount(entries, n, key, today) {
+    if (!entries.length) return 0;
+    var days = lastNDaysAmount(entries, n, key, today);
+    return days.filter(function (d) { return d.amount > 0; }).length;
+  }
+
+  // ---- backward-compatible grams-only wrappers (alcohol) ----
+
+  function totalGrams(entries) { return totalAmount(entries, "grams"); }
+  function groupByDay(entries) { return groupByDayAmount(entries, "grams"); }
+  function groupByWeek(entries) { return groupByWeekAmount(entries, "grams"); }
+  function groupByType(entries) { return groupByTypeAmount(entries, "grams"); }
+  function lastNDays(entries, n, today) {
+    return lastNDaysAmount(entries, n, "grams", today).map(function (d) {
+      return { date: d.date, grams: d.amount };
+    });
+  }
+  function lastNWeeks(entries, n, today) {
+    return lastNWeeksAmount(entries, n, "grams", today).map(function (w) {
+      return { weekKey: w.weekKey, weekStart: w.weekStart, grams: w.amount };
+    });
+  }
+  function currentFreeStreak(entries, today) { return currentFreeStreakAmount(entries, "grams", today); }
+  function freeDaysCount(entries, n, today) { return freeDaysCountAmount(entries, n, "grams", today); }
 
   return {
     ETHANOL_DENSITY: ETHANOL_DENSITY,
     UNIT_GRAMS: UNIT_GRAMS,
+    MG_THC_PER_UNIT: MG_THC_PER_UNIT,
     WEEKLY_REFERENCES_G: WEEKLY_REFERENCES_G,
+    DEFAULT_WARN_THRESHOLDS: DEFAULT_WARN_THRESHOLDS,
+
     gramsFromVolumeAbv: gramsFromVolumeAbv,
+    litersFromGrams: litersFromGrams,
     unitsFromGrams: unitsFromGrams,
+    mgThcFromFlower: mgThcFromFlower,
+    thcUnitsFromMg: thcUnitsFromMg,
+
     toDateKey: toDateKey,
     isoWeekKey: isoWeekKey,
+    monthKey: monthKey,
+    yearKey: yearKey,
     startOfWeek: startOfWeek,
+    startOfMonth: startOfMonth,
+
+    // generic (key-based) — used for weed (key: "mgThc") and alcohol (key: "grams")
+    totalAmount: totalAmount,
+    groupByDayAmount: groupByDayAmount,
+    groupByWeekAmount: groupByWeekAmount,
+    groupByMonthAmount: groupByMonthAmount,
+    groupByYearAmount: groupByYearAmount,
+    groupByTypeAmount: groupByTypeAmount,
+    lastNDaysAmount: lastNDaysAmount,
+    lastNWeeksAmount: lastNWeeksAmount,
+    lastNMonthsAmount: lastNMonthsAmount,
+    yearTotalAmount: yearTotalAmount,
+    currentFreeStreakAmount: currentFreeStreakAmount,
+    freeDaysCountAmount: freeDaysCountAmount,
+    usedDaysCountAmount: usedDaysCountAmount,
+
+    // grams-only wrappers (v1 compatibility)
     totalGrams: totalGrams,
     groupByDay: groupByDay,
     groupByWeek: groupByWeek,
@@ -203,6 +343,8 @@
     lastNWeeks: lastNWeeks,
     currentFreeStreak: currentFreeStreak,
     freeDaysCount: freeDaysCount,
+
     round1: round1,
+    round3: round3,
   };
 });

@@ -107,6 +107,94 @@
     "type.spirits": { en: "Spirits", de: "Spirituosen" },
     "type.cocktail": { en: "Cocktail", de: "Cocktail" },
     "type.other": { en: "Other", de: "Sonstiges" },
+
+    "wtype.joint": { en: "Joint", de: "Joint" },
+    "wtype.pipe": { en: "Pipe/Bowl", de: "Pfeife/Bong" },
+    "wtype.vape": { en: "Vape", de: "Vape" },
+    "wtype.edible": { en: "Edible", de: "Essbar" },
+    "wtype.other": { en: "Other", de: "Sonstiges" },
+
+    // ---- substance switcher (Log / Stats / Info all reuse this) ----
+    "substance.alcohol": { en: "🍺 Alcohol", de: "🍺 Alkohol" },
+    "substance.weed": { en: "🌿 Weed", de: "🌿 Cannabis" },
+
+    "unit.liters": { en: "L pure alcohol", de: "L reiner Alkohol" },
+    "unit.thcUnits": { en: "THC units (5mg)", de: "THC-Einheiten (5mg)" },
+
+    // ---- weed log/modal ----
+    "modal.titleWeed": { en: "Add a session", de: "Konsum hinzufügen" },
+    "modal.method": { en: "Method", de: "Methode" },
+    "modal.flowerGrams": { en: "Flower (g)", de: "Blüten (g)" },
+    "modal.thcPercent": { en: "THC (%)", de: "THC (%)" },
+    "modal.mgThc": { en: "THC (mg)", de: "THC (mg)" },
+    "modal.enterMgDirect": {
+      en: "Know the mg THC (vape/edible label)? Enter it directly instead:",
+      de: "mg THC bekannt (Vape-/Edible-Etikett)? Direkt eingeben:",
+    },
+
+    // ---- monthly / yearly ----
+    "stats.thisMonth": { en: "This month", de: "Diesen Monat" },
+    "stats.thisYear": { en: "This year", de: "Dieses Jahr" },
+    "stats.lastYear": { en: "Last year", de: "Letztes Jahr" },
+    "stats.months": { en: "Last 12 months", de: "Letzte 12 Monate" },
+
+    // ---- warnings ----
+    "warn.overDaily": {
+      en: "Over your daily guideline today",
+      de: "Über deiner Tagesgrenze heute",
+    },
+    "warn.overWeekly": {
+      en: "Over your weekly guideline this week",
+      de: "Über deiner Wochengrenze diese Woche",
+    },
+    "warn.weedFrequent": {
+      en: "Used on {n} of the last 7 days — LRCUG suggests avoiding near-daily use",
+      de: "An {n} der letzten 7 Tage konsumiert — die LRCUG raten von (nahezu) täglichem Konsum ab",
+    },
+
+    "settings.warnThresholds": { en: "Warning thresholds", de: "Warnschwellen" },
+    "settings.warnDailyG": { en: "Daily alcohol (g)", de: "Alkohol pro Tag (g)" },
+    "settings.warnWeeklyG": { en: "Weekly alcohol (g)", de: "Alkohol pro Woche (g)" },
+    "settings.warnWeedDays": {
+      en: "Weed: flag if used on this many of the last 7 days",
+      de: "Cannabis: warnen ab so vielen Tagen der letzten 7",
+    },
+    "settings.warnNote": {
+      en: "Prefilled from published guidelines (UK CMO 112g/week ≈ 14 units; LRCUG's near-daily caution). Edit to whatever makes sense for you — these are just a starting point, not a medical recommendation.",
+      de: "Voreingestellt nach veröffentlichten Leitlinien (UK CMO 112g/Woche ≈ 14 Units; LRCUG-Hinweis zu (nahezu) täglichem Konsum). Passe die Werte nach Bedarf an — das ist ein Ausgangspunkt, keine medizinische Empfehlung.",
+    },
+
+    // ---- profiles (local, offline — no accounts, no server) ----
+    "profile.who": { en: "Who's tracking?", de: "Wer erfasst gerade?" },
+    "profile.whoNote": {
+      en: "Each profile keeps its own separate log on this device. Nothing leaves this phone, and nothing is a real “account” — just a name (and optional PIN) so more than one person can use this install.",
+      de: "Jedes Profil führt sein eigenes, getrenntes Protokoll auf diesem Gerät. Nichts verlässt dieses Telefon, und es ist kein echtes „Konto“ — nur ein Name (und optional eine PIN), damit mehrere Personen diese Installation nutzen können.",
+    },
+    "profile.add": { en: "+ Add profile", de: "+ Profil hinzufügen" },
+    "profile.name": { en: "Name", de: "Name" },
+    "profile.pinOptional": { en: "PIN (optional, 4 digits)", de: "PIN (optional, 4 Ziffern)" },
+    "profile.pinNote": {
+      en: "This only keeps casual/curious hands out — it's stored on-device and isn't real security. Anyone with access to the phone's storage could bypass it.",
+      de: "Das hält nur beiläufige/neugierige Blicke fern — sie wird lokal gespeichert und ist keine echte Sicherheit. Wer Zugriff auf den Gerätespeicher hat, könnte sie umgehen.",
+    },
+    "profile.create": { en: "Create profile", de: "Profil erstellen" },
+    "profile.enter": { en: "Enter", de: "Los" },
+    "profile.enterPin": { en: "Enter PIN", de: "PIN eingeben" },
+    "profile.wrongPin": { en: "Wrong PIN", de: "Falsche PIN" },
+    "profile.switch": { en: "Switch profile", de: "Profil wechseln" },
+    "profile.rename": { en: "Rename", de: "Umbenennen" },
+    "profile.delete": { en: "Delete profile", de: "Profil löschen" },
+    "profile.deleteConfirm": {
+      en: "Delete this profile and all of its logged data? This cannot be undone.",
+      de: "Dieses Profil und alle erfassten Daten löschen? Das kann nicht rückgängig gemacht werden.",
+    },
+    "profile.needName": { en: "Please enter a name", de: "Bitte einen Namen eingeben" },
+    "settings.profile": { en: "Profile", de: "Profil" },
+
+    "info.disclaimerWeed": {
+      en: "Personal tracking only — not medical or legal advice. Cannabis laws vary a lot by country and region; know what applies where you are.",
+      de: "Nur zur persönlichen Aufzeichnung — keine medizinische oder rechtliche Beratung. Cannabisgesetze unterscheiden sich stark je nach Land und Region — informiere dich über die für dich geltenden Regeln.",
+    },
   };
 
   function t(key, lang) {
@@ -215,5 +303,94 @@
     },
   ];
 
-  root.I18N = { STRINGS: STRINGS, t: t, INFO_SECTIONS: INFO_SECTIONS };
+  // ---- Info tab content for the Weed section, bilingual, with sources ----
+  var INFO_SECTIONS_WEED = [
+    {
+      en: {
+        title: "The “Standard THC Unit”",
+        body:
+          "Just like alcohol, cannabis potency varies wildly across joints, pipes, vapes, and edibles — so researchers use a fixed reference: one Standard THC Unit = 5mg of THC. The US NIH now requires this unit for THC reporting in the research it funds. LiverLogger converts every entry to mg THC and units automatically, the same way it converts drinks to grams.",
+        source: "NIH-mandated THC unit; standard-unit research",
+        url: "https://www.medrxiv.org/content/10.1101/2025.05.21.25328059.full.pdf",
+      },
+      de: {
+        title: "Die „Standard-THC-Einheit“",
+        body:
+          "Genau wie bei Alkohol schwankt die Wirkstärke von Cannabis je nach Joint, Pfeife, Vape oder Edible stark — Forschende nutzen daher eine feste Referenz: eine Standard-THC-Einheit = 5mg THC. Die US-Gesundheitsbehörde NIH schreibt diese Einheit inzwischen für die Berichterstattung in von ihr finanzierter Forschung vor. LiverLogger rechnet jeden Eintrag automatisch in mg THC und Einheiten um — genau wie bei Getränken in Gramm.",
+        source: "NIH-Standardeinheit; Forschung zu Standard-THC-Einheiten",
+        url: "https://www.medrxiv.org/content/10.1101/2025.05.21.25328059.full.pdf",
+      },
+    },
+    {
+      en: {
+        title: "Canada's Lower-Risk Cannabis Use Guidelines",
+        body:
+          "The LRCUG summarize the evidence on reducing cannabis-related health risks, in the same spirit as low-risk drinking guidelines. Core recommendations: delay starting for as long as possible (the brain keeps developing into the mid-20s), avoid using daily or near-daily, avoid deep inhalation and breath-holding, favour lower-THC products, and never combine with driving.",
+        source: "CAMH / Canada's LRCUG",
+        url: "https://www.camh.ca/-/media/files/lrcug_professional-pdf",
+      },
+      de: {
+        title: "Kanadas Leitlinien für risikoärmeren Cannabiskonsum (LRCUG)",
+        body:
+          "Die LRCUG fassen die Evidenz zur Reduzierung cannabisbedingter Gesundheitsrisiken zusammen — im gleichen Geist wie Leitlinien für risikoarmen Alkoholkonsum. Kernempfehlungen: Konsumbeginn so lange wie möglich hinauszögern (das Gehirn entwickelt sich bis Mitte 20 weiter), nicht täglich oder nahezu täglich konsumieren, tiefes Inhalieren und Luftanhalten vermeiden, Produkte mit niedrigerem THC-Gehalt bevorzugen und nie in Kombination mit Autofahren.",
+        source: "CAMH / Kanadas LRCUG",
+        url: "https://www.camh.ca/-/media/files/lrcug_professional-pdf",
+      },
+    },
+    {
+      en: {
+        title: "Germany: the Cannabisgesetz (since April 2024)",
+        body:
+          "Since 1 April 2024, adults 18+ in Germany may possess up to 25g of cannabis in public and up to 50g at home, and grow up to three plants. Since July 2024, non-profit “cannabis social clubs” of up to 500 members are permitted. Regular commercial retail sale is still not part of the model.",
+        source: "Cannabisgesetz (CanG)",
+        url: "https://en.wikipedia.org/wiki/Cannabis_Act_(Germany)",
+      },
+      de: {
+        title: "Deutschland: das Cannabisgesetz (seit April 2024)",
+        body:
+          "Seit dem 1. April 2024 dürfen Erwachsene ab 18 Jahren in Deutschland bis zu 25g Cannabis öffentlich und bis zu 50g zu Hause besitzen sowie bis zu drei Pflanzen selbst anbauen. Seit Juli 2024 sind nicht-kommerzielle „Cannabis Social Clubs“ mit bis zu 500 Mitgliedern erlaubt. Ein regulärer Verkauf über Geschäfte ist weiterhin nicht vorgesehen.",
+        source: "Cannabisgesetz (CanG)",
+        url: "https://en.wikipedia.org/wiki/Cannabis_Act_(Germany)",
+      },
+    },
+    {
+      en: {
+        title: "Health risks (2025 research)",
+        body:
+          "A 2025 systematic review estimated about 22% of people who use cannabis meet criteria for cannabis use disorder, rising to roughly 33% among those who use weekly or daily as young people. Use before about age 25, while the brain is still developing, carries greater risk to memory, attention, and learning. Daily use of high-potency products is linked to a greater likelihood of psychosis and schizophrenia; acutely, cannabis raises heart rate and blood pressure.",
+        source: "CDC — Cannabis and Public Health",
+        url: "https://www.cdc.gov/cannabis/health-effects/index.html",
+      },
+      de: {
+        title: "Gesundheitliche Risiken (Forschungsstand 2025)",
+        body:
+          "Eine 2025 veröffentlichte systematische Übersichtsarbeit schätzt, dass etwa 22% der Cannabiskonsumierenden die Kriterien für eine Cannabiskonsumstörung erfüllen — bei wöchentlichem oder täglichem Konsum im Jugend-/jungen Erwachsenenalter steigt der Anteil auf rund 33%. Konsum vor etwa 25 Jahren, während sich das Gehirn noch entwickelt, ist mit höheren Risiken für Gedächtnis, Aufmerksamkeit und Lernen verbunden. Täglicher Konsum hochpotenter Produkte wird mit einem erhöhten Psychose- und Schizophrenierisiko in Verbindung gebracht; akut erhöht Cannabis Herzfrequenz und Blutdruck.",
+        source: "CDC — Cannabis and Public Health",
+        url: "https://www.cdc.gov/cannabis/health-effects/index.html",
+      },
+    },
+    {
+      en: {
+        title: "Smoked ≠ absorbed",
+        body:
+          "When cannabis is smoked, only about 10–25% of its THC content actually reaches the bloodstream — the rest is lost to combustion and exhaled breath. So the mg THC logged here reflects what was consumed, not the effective dose absorbed. Edibles absorb more fully but act much more slowly, which is a common cause of accidental overdosing while waiting for effects to kick in.",
+        source: "THC bioavailability reviews",
+        url: "https://leafwell.com/blog/how-to-dose-marijuana-for-smoking",
+      },
+      de: {
+        title: "Geraucht ≠ aufgenommen",
+        body:
+          "Beim Rauchen gelangen nur etwa 10–25% des enthaltenen THC tatsächlich in den Blutkreislauf — der Rest geht bei Verbrennung und Ausatmen verloren. Die hier erfassten mg-THC-Werte bilden also den konsumierten Wirkstoffgehalt ab, nicht die tatsächlich aufgenommene Dosis. Edibles werden vollständiger aufgenommen, wirken aber deutlich verzögert — ein häufiger Grund für unbeabsichtigt hohe Dosierung, während auf die Wirkung gewartet wird.",
+        source: "Übersichten zur THC-Bioverfügbarkeit",
+        url: "https://leafwell.com/blog/how-to-dose-marijuana-for-smoking",
+      },
+    },
+  ];
+
+  root.I18N = {
+    STRINGS: STRINGS,
+    t: t,
+    INFO_SECTIONS: INFO_SECTIONS,
+    INFO_SECTIONS_WEED: INFO_SECTIONS_WEED,
+  };
 })(typeof window !== "undefined" ? window : this);

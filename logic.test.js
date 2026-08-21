@@ -86,4 +86,67 @@ check("lastNWeeks length", weeks.length, 3);
 check("currentFreeStreak with zero entries", L.currentFreeStreak([], new Date(2026, 6, 31)), 0);
 check("freeDaysCount with zero entries", L.freeDaysCount([], 30, new Date(2026, 6, 31)), 0);
 
+// =================== v2: liters, weed, month/year ===================
+
+// --- liters of pure alcohol (primary unit) vs grams (secondary) ---
+// 14g (one US standard drink) of pure ethanol at 0.789 g/mL ≈ 0.01775 L
+check("litersFromGrams(14)", L.litersFromGrams(14), 0.01775, 0.0002);
+// ABV is already a volume percent, so liters of pure alcohol should equal
+// (volumeMl * abv/100) / 1000 regardless of the grams/density round trip.
+check(
+  "litersFromGrams round-trips with gramsFromVolumeAbv",
+  L.litersFromGrams(L.gramsFromVolumeAbv(500, 5)),
+  (500 * 0.05) / 1000,
+  0.0002
+);
+
+// --- weed: mg THC + standard THC units (5mg/unit, NIH-mandated reporting unit) ---
+// a 0.5g joint at 20% THC -> 100mg THC -> 20 standard THC units
+check("mgThcFromFlower(0.5g, 20%)", L.mgThcFromFlower(0.5, 20), 100);
+check("thcUnitsFromMg(100)", L.thcUnitsFromMg(100), 20);
+check("thcUnitsFromMg(5) = 1 unit", L.thcUnitsFromMg(5), 1);
+
+// --- generic key-based aggregation reused for weed entries (key: "mgThc") ---
+const weedEntries = [
+  { id: 1, ts: "2026-07-28T19:00:00", type: "joint", mgThc: 100 },
+  { id: 2, ts: "2026-07-29T19:00:00", type: "vape", mgThc: 20 },
+  { id: 3, ts: "2026-07-30T19:00:00", type: "joint", mgThc: 100 },
+  { id: 4, ts: "2026-07-31T19:00:00", type: "joint", mgThc: 100 },
+];
+check("totalAmount weed mgThc", L.totalAmount(weedEntries, "mgThc"), 320);
+check(
+  "usedDaysCountAmount weed, last 5 days incl. 07-27 free",
+  L.usedDaysCountAmount(weedEntries, 5, "mgThc", new Date(2026, 6, 31)),
+  4 // 07-28..07-31 all have entries, 07-27 doesn't
+);
+check(
+  "freeDaysCountAmount weed, last 5 days",
+  L.freeDaysCountAmount(weedEntries, 5, "mgThc", new Date(2026, 6, 31)),
+  1
+);
+
+// --- month/year grouping (alcohol entries, key: "grams") ---
+const spanEntries = [
+  { id: 1, ts: "2026-06-15T19:00:00", type: "beer", grams: 10 },
+  { id: 2, ts: "2026-07-05T19:00:00", type: "beer", grams: 20 },
+  { id: 3, ts: "2026-07-20T19:00:00", type: "wine", grams: 5 },
+  { id: 4, ts: "2025-07-10T19:00:00", type: "beer", grams: 50 }, // last year, same month
+];
+check("monthKey", L.monthKey(new Date(2026, 6, 15)), "2026-07");
+check("yearKey", L.yearKey(new Date(2026, 6, 15)), "2026");
+check("groupByMonthAmount 2026-07", L.groupByMonthAmount(spanEntries, "grams")["2026-07"], 25);
+check("groupByMonthAmount 2026-06", L.groupByMonthAmount(spanEntries, "grams")["2026-06"], 10);
+
+const months = L.lastNMonthsAmount(spanEntries, 3, "grams", new Date(2026, 6, 31)); // May, Jun, Jul 2026
+check("lastNMonthsAmount length", months.length, 3);
+check("lastNMonthsAmount July total", months.find((m) => m.monthKey === "2026-07").amount, 25);
+check("lastNMonthsAmount May is empty", months.find((m) => m.monthKey === "2026-05").amount, 0);
+
+check("yearTotalAmount 2026", L.yearTotalAmount(spanEntries, "grams", "2026"), 35);
+check("yearTotalAmount 2025", L.yearTotalAmount(spanEntries, "grams", "2025"), 50);
+
+// grams-only wrappers still behave identically to before this refactor
+check("totalGrams wrapper unchanged", L.totalGrams(entries), 45);
+check("lastNDays wrapper still returns .grams field", L.lastNDays(entries, 1, new Date(2026, 6, 31))[0].grams, 0);
+
 console.log(pass + " checks passed" + (process.exitCode ? ", SOME FAILED" : ""));

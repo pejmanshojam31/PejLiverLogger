@@ -1,7 +1,7 @@
 /* LiverLogger service worker — cache-first app shell so the whole app works
    with the phone in airplane mode after the first successful load. Bump
    CACHE_NAME whenever the shipped files change so old caches get replaced. */
-var CACHE_NAME = "liverlogger-v1";
+var CACHE_NAME = "liverlogger-v2";
 var APP_SHELL = [
   "./",
   "./index.html",
