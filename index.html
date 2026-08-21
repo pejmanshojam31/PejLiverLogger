@@ -25,17 +25,28 @@
     <span class="brand-mark">🥃</span>
     <span class="brand-name">LiverLogger</span>
   </div>
-  <div class="topbar-date" id="topbar-date"></div>
+  <div class="topbar-right">
+    <div class="topbar-date" id="topbar-date"></div>
+    <button class="profile-chip" id="profile-chip"><span id="profile-chip-label">—</span></button>
+  </div>
 </header>
+
+<!-- ================= WARNING BANNER ================= -->
+<div class="warn-banner hidden" id="warn-banner"></div>
 
 <!-- ================= LOG TAB ================= -->
 <main id="tab-log" class="tab-panel">
 
+  <div class="segmented substance-switch" id="substance-switch-log">
+    <button data-substance="alcohol" class="active" data-i18n="substance.alcohol"></button>
+    <button data-substance="weed" data-i18n="substance.weed"></button>
+  </div>
+
   <section class="today-card">
     <div class="today-card-row">
       <div>
-        <div class="today-total" id="today-total-grams">0 g</div>
-        <div class="today-sub" id="today-total-units" data-i18n="today.units"></div>
+        <div class="today-total" id="today-total-primary">0 L</div>
+        <div class="today-sub" id="today-total-secondary"></div>
       </div>
       <div class="today-streak" id="today-streak"></div>
     </div>
@@ -61,6 +72,11 @@
 <!-- ================= STATS TAB ================= -->
 <main id="tab-stats" class="tab-panel hidden">
 
+  <div class="segmented substance-switch" id="substance-switch-stats">
+    <button data-substance="alcohol" class="active" data-i18n="substance.alcohol"></button>
+    <button data-substance="weed" data-i18n="substance.weed"></button>
+  </div>
+
   <section class="stat-cards">
     <div class="stat-card">
       <div class="stat-value" id="stat-free-streak">0</div>
@@ -76,6 +92,21 @@
     </div>
   </section>
 
+  <section class="stat-cards">
+    <div class="stat-card">
+      <div class="stat-value" id="stat-month-total"></div>
+      <div class="stat-label" data-i18n="stats.thisMonth"></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="stat-year-total"></div>
+      <div class="stat-label" data-i18n="stats.thisYear"></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="stat-lastyear-total"></div>
+      <div class="stat-label" data-i18n="stats.lastYear"></div>
+    </div>
+  </section>
+
   <section>
     <h2 class="section-title" data-i18n="stats.last7"></h2>
     <div class="chart-box"><canvas id="chart-7day"></canvas></div>
@@ -85,6 +116,11 @@
     <h2 class="section-title" data-i18n="stats.weeks"></h2>
     <div class="chart-box"><canvas id="chart-weeks"></canvas></div>
     <p class="chart-note" data-i18n="stats.weeksNote"></p>
+  </section>
+
+  <section>
+    <h2 class="section-title" data-i18n="stats.months"></h2>
+    <div class="chart-box"><canvas id="chart-months"></canvas></div>
   </section>
 
   <section>
@@ -114,12 +150,24 @@
 
 <!-- ================= INFO TAB ================= -->
 <main id="tab-info" class="tab-panel hidden">
-  <p class="disclaimer" data-i18n="info.disclaimer"></p>
+  <div class="segmented substance-switch" id="substance-switch-info">
+    <button data-substance="alcohol" class="active" data-i18n="substance.alcohol"></button>
+    <button data-substance="weed" data-i18n="substance.weed"></button>
+  </div>
+  <p class="disclaimer" id="info-disclaimer"></p>
   <div id="info-content"><!-- injected --></div>
 </main>
 
 <!-- ================= SETTINGS TAB ================= -->
 <main id="tab-settings" class="tab-panel hidden">
+
+  <section>
+    <div class="section-title-row">
+      <h2 class="section-title" data-i18n="settings.profile"></h2>
+      <button class="link-btn" id="btn-switch-profile" data-i18n="profile.switch"></button>
+    </div>
+    <div class="profile-current" id="profile-current-box"></div>
+  </section>
 
   <section>
     <h2 class="section-title" data-i18n="settings.language"></h2>
@@ -137,6 +185,17 @@
       <button data-unit="de" data-i18n="settings.unitDe"></button>
     </div>
     <p class="chart-note" data-i18n="settings.unitNote"></p>
+  </section>
+
+  <section>
+    <h2 class="section-title" data-i18n="settings.warnThresholds"></h2>
+    <label class="modal-label" data-i18n="settings.warnDailyG"></label>
+    <input type="number" id="warn-daily-g" inputmode="numeric" min="0" step="1">
+    <label class="modal-label" data-i18n="settings.warnWeeklyG"></label>
+    <input type="number" id="warn-weekly-g" inputmode="numeric" min="0" step="1">
+    <label class="modal-label" data-i18n="settings.warnWeedDays"></label>
+    <input type="number" id="warn-weed-days" inputmode="numeric" min="1" max="7" step="1">
+    <p class="chart-note" data-i18n="settings.warnNote"></p>
   </section>
 
   <section>
@@ -169,26 +228,52 @@
 <!-- ================= CUSTOM ENTRY MODAL ================= -->
 <div class="modal-backdrop hidden" id="custom-modal">
   <div class="modal">
-    <h3 data-i18n="modal.title"></h3>
+    <h3 id="modal-heading"></h3>
 
     <label class="modal-label" data-i18n="modal.type"></label>
-    <div class="segmented" id="modal-type">
+    <div class="segmented" id="modal-type-alcohol">
       <button data-type="beer">🍺</button>
       <button data-type="wine">🍷</button>
       <button data-type="spirits">🥃</button>
       <button data-type="cocktail">🍸</button>
       <button data-type="other">🍹</button>
     </div>
+    <div class="segmented hidden" id="modal-type-weed">
+      <button data-type="joint">🚬</button>
+      <button data-type="pipe">🪈</button>
+      <button data-type="vape">💨</button>
+      <button data-type="edible">🍪</button>
+      <button data-type="other">🌿</button>
+    </div>
 
-    <label class="modal-label" data-i18n="modal.volume"></label>
-    <input type="number" id="modal-volume" inputmode="numeric" min="0" step="10" placeholder="330">
+    <div id="modal-fields-alcohol">
+      <label class="modal-label" data-i18n="modal.volume"></label>
+      <input type="number" id="modal-volume" inputmode="numeric" min="0" step="10" placeholder="330">
 
-    <label class="modal-label" data-i18n="modal.abv"></label>
-    <input type="number" id="modal-abv" inputmode="decimal" min="0" step="0.5" placeholder="5">
-    <div class="chip-row">
-      <button class="chip" data-abv="5">5%</button>
-      <button class="chip" data-abv="12">12%</button>
-      <button class="chip" data-abv="40">40%</button>
+      <label class="modal-label" data-i18n="modal.abv"></label>
+      <input type="number" id="modal-abv" inputmode="decimal" min="0" step="0.5" placeholder="5">
+      <div class="chip-row">
+        <button class="chip" data-abv="5">5%</button>
+        <button class="chip" data-abv="12">12%</button>
+        <button class="chip" data-abv="40">40%</button>
+      </div>
+    </div>
+
+    <div id="modal-fields-weed" class="hidden">
+      <label class="modal-label" data-i18n="modal.flowerGrams"></label>
+      <input type="number" id="modal-flower-grams" inputmode="decimal" min="0" step="0.1" placeholder="0.5">
+
+      <label class="modal-label" data-i18n="modal.thcPercent"></label>
+      <input type="number" id="modal-thc-percent" inputmode="decimal" min="0" step="1" placeholder="20">
+      <div class="chip-row">
+        <button class="chip" data-thc="15">15%</button>
+        <button class="chip" data-thc="20">20%</button>
+        <button class="chip" data-thc="25">25%</button>
+      </div>
+
+      <p class="chart-note" data-i18n="modal.enterMgDirect"></p>
+      <label class="modal-label" data-i18n="modal.mgThc"></label>
+      <input type="number" id="modal-mg-thc" inputmode="numeric" min="0" step="1" placeholder="e.g. 10">
     </div>
 
     <div class="modal-preview" id="modal-preview"></div>
@@ -205,6 +290,47 @@
   </div>
 </div>
 
+<!-- ================= PROFILE ONBOARDING (first run) ================= -->
+<div class="modal-backdrop hidden" id="profile-onboarding">
+  <div class="modal">
+    <h3 data-i18n="profile.who"></h3>
+    <p class="chart-note" data-i18n="profile.whoNote"></p>
+    <label class="modal-label" data-i18n="profile.name"></label>
+    <input type="text" id="onboard-name" placeholder="e.g. Peji" autocomplete="off">
+    <label class="modal-label" data-i18n="profile.pinOptional"></label>
+    <input type="tel" id="onboard-pin" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••">
+    <p class="chart-note" data-i18n="profile.pinNote"></p>
+    <div class="btn-row">
+      <button class="btn-primary" id="onboard-create" data-i18n="profile.create"></button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= PROFILE SWITCH SHEET ================= -->
+<div class="modal-backdrop hidden" id="profile-switch-sheet">
+  <div class="modal">
+    <h3 data-i18n="profile.who"></h3>
+    <ul class="profile-list" id="profile-list"><!-- injected --></ul>
+    <div class="btn-row">
+      <button class="btn-secondary" id="profile-add-btn" data-i18n="profile.add"></button>
+      <button class="btn-secondary" id="profile-switch-cancel" data-i18n="modal.cancel"></button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= PROFILE PIN PROMPT ================= -->
+<div class="modal-backdrop hidden" id="profile-pin-prompt">
+  <div class="modal">
+    <h3 data-i18n="profile.enterPin"></h3>
+    <input type="tel" id="pin-prompt-input" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••">
+    <p class="chart-note hidden" id="pin-prompt-error" data-i18n="profile.wrongPin"></p>
+    <div class="btn-row">
+      <button class="btn-secondary" id="pin-prompt-cancel" data-i18n="modal.cancel"></button>
+      <button class="btn-primary" id="pin-prompt-enter" data-i18n="profile.enter"></button>
+    </div>
+  </div>
+</div>
+
 <!-- ================= TOAST ================= -->
 <div class="toast hidden" id="toast">
   <span id="toast-text"></span>
@@ -214,7 +340,7 @@
 <!-- ================= BOTTOM NAV ================= -->
 <nav class="tabbar">
   <button class="tabbar-btn active" data-tab="log">
-    <span class="tabbar-icon">🍺</span><span data-i18n="nav.log"></span>
+    <span class="tabbar-icon">📝</span><span data-i18n="nav.log"></span>
   </button>
   <button class="tabbar-btn" data-tab="stats">
     <span class="tabbar-icon">📊</span><span data-i18n="nav.stats"></span>

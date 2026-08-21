@@ -44,7 +44,36 @@ html, body {
 .topbar-brand { display: flex; align-items: center; gap: 8px; }
 .brand-mark { font-size: 20px; }
 .brand-name { font-weight: 700; color: var(--ink); font-size: 17px; letter-spacing: 0.01em; }
+.topbar-right { display: flex; align-items: center; gap: 10px; }
 .topbar-date { font-size: 13px; color: var(--ink-muted); }
+.profile-chip {
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--ink-soft);
+  background: var(--bg-card);
+  border: 1px solid var(--hairline);
+  border-radius: 20px;
+  padding: 5px 12px;
+}
+.profile-chip:active { background: var(--bg-card-2); }
+
+/* ---------------- warning banner ---------------- */
+.warn-banner {
+  margin: 0 16px 16px;
+  max-width: 528px;
+  margin-left: auto;
+  margin-right: auto;
+  background: rgba(209, 97, 92, 0.14);
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ---------------- substance switch ---------------- */
+.substance-switch { margin-bottom: 18px; }
 
 /* ---------------- layout ---------------- */
 main.tab-panel {
@@ -264,7 +293,7 @@ main.tab-panel > section { margin-bottom: 28px; }
 }
 .modal h3 { margin: 0 0 14px; color: var(--ink); }
 .modal-label { display: block; font-size: 12px; color: var(--ink-muted); margin: 14px 0 6px; text-transform: uppercase; letter-spacing: 0.03em; }
-.modal input[type="number"] {
+input[type="number"], input[type="text"], input[type="tel"] {
   width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--hairline);
   background: var(--bg-card-2); color: var(--ink); font-size: 16px; font-family: inherit;
 }
@@ -322,6 +351,18 @@ main.tab-panel > section { margin-bottom: 28px; }
 }
 .tabbar-icon { font-size: 20px; }
 .tabbar-btn.active { color: var(--ink); }
+
+/* ---------------- profiles ---------------- */
+.profile-current { background: var(--bg-card); border: 1px solid var(--hairline); border-radius: 12px; padding: 14px; }
+.profile-name-line { font-size: 15px; color: var(--ink); font-weight: 600; margin-bottom: 10px; }
+.profile-list { list-style: none; margin: 0 0 14px; padding: 0; max-height: 40vh; overflow-y: auto; }
+.profile-list-row {
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--hairline);
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+.profile-list-row:active { background: var(--bg-card-2); }
 
 @media (min-width: 600px) {
   .preset-grid { grid-template-columns: repeat(4, 1fr); }
